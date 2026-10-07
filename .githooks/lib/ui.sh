@@ -42,10 +42,13 @@ spin() {
   done
 }
 
-# ok_line / fail_line "Nombre" "detalle"
+# ok_line / fail_line / skip_line "Nombre" "detalle"
 ok_line() {
   printf '\r  %s%-*s✔%s  %s%s%s%s\n' "$GREEN" "$COL" "$1" "$RESET" "$DIM" "$2" "$RESET" "$CLEAR" >&2
 }
 fail_line() {
   printf '\r  %s%-*s✖%s  %s%s%s%s\n' "$RED" "$COL" "$1" "$RESET" "$DIM" "$2" "$RESET" "$CLEAR" >&2
+}
+skip_line() {
+  printf '\r  %s%-*s–  %s%s%s\n' "$DIM" "$COL" "$1" "$2" "$RESET" "$CLEAR" >&2
 }

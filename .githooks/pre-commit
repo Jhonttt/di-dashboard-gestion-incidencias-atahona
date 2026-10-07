@@ -34,11 +34,20 @@ run_check() {
   fi
 }
 
-run_check "Formato (Spotless)"  "ejecuta mvn spotless:apply y vuelve a hacer git add" \
-  mvn -q spotless:check
+# Archivos en staging (añadidos, copiados, modificados o renombrados)
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
 
-run_check "Estilo (Checkstyle)" "corrige los errores indicados arriba" \
-  mvn -q checkstyle:check
+# Solo se comprueba si hay Java o configuración que afecte a las herramientas
+if echo "$STAGED" | grep -Eq '\.java$|(^|/)pom\.xml$|^config/checkstyle/'; then
+  run_check "Formato (Spotless)"  "ejecuta mvn spotless:apply y vuelve a hacer git add" \
+    mvn -q spotless:check
+
+  run_check "Estilo (Checkstyle)" "corrige los errores indicados arriba" \
+    mvn -q checkstyle:check
+else
+  skip_line "Formato (Spotless)"  "sin cambios en Java"
+  skip_line "Estilo (Checkstyle)" "sin cambios en Java"
+fi
 
 # El bloque lo cierra commit-msg
 echo $(( $(now_ms) - START )) > "$TIME_FILE"
